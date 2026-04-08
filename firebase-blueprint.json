@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "ScrapeHistory": {
+      "title": "ScrapeHistory",
+      "description": "Stores the history of scraped URLs and their metadata.",
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The URL that was scraped."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["page", "sequence"],
+          "description": "The mode used for scraping."
+        },
+        "imageCount": {
+          "type": "number",
+          "description": "Number of images found."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the scrape occurred."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user who performed the scrape."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "The suggested filename for the PDF."
+        }
+      },
+      "required": ["url", "mode", "imageCount", "timestamp", "userId"]
+    }
+  },
+  "firestore": {
+    "/history/{historyId}": {
+      "schema": "ScrapeHistory",
+      "description": "Collection of scrape history records."
+    }
+  }
+}

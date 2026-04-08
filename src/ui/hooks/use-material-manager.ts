@@ -21,7 +21,7 @@ export function useMaterialManager() {
   const [scrapeMode, setScrapeMode] = useState<"page" | "sequence" | null>(null);
   const [fileName, setFileName] = useState("");
 
-  const handleScrape = useCallback(async () => {
+  const handleScrape = useCallback(async (onScrapeSuccess?: (url: string, mode: "page" | "sequence", count: number, fileName: string) => void) => {
     setIsScraping(true);
     setImages([]);
     setScrapeMode(null);
@@ -29,7 +29,13 @@ export function useMaterialManager() {
       const result = await scrapeUseCase.execute(url);
       setScrapeMode(result.mode);
       setImages(result.images);
-      inferFileName(url);
+      const inferredName = inferFileName(url);
+      setFileName(inferredName);
+      
+      if (onScrapeSuccess) {
+        onScrapeSuccess(url, result.mode, result.images.length, inferredName);
+      }
+      
       toast.success(`Found ${result.images.length} images (${result.mode} mode)`);
     } catch (error: any) {
       toast.error(error.message);
@@ -62,18 +68,19 @@ export function useMaterialManager() {
     setImages(prev => prev.map((img, i) => (i === index ? { ...img, selected: !img.selected } : img)));
   }, []);
 
-  const inferFileName = (sourceUrl: string) => {
+  const inferFileName = (sourceUrl: string): string => {
     try {
       const urlObj = new URL(sourceUrl);
       const parts = urlObj.pathname.split('/').filter(Boolean);
       if (parts.length > 0) {
         let name = parts[parts.length - 1];
         if (["mobile", "files", "modul"].includes(name)) name = parts[parts.length - 2] || name;
-        setFileName(name.replace(/\.[^/.]+$/, ""));
+        return name.replace(/\.[^/.]+$/, "");
       }
     } catch {
-      setFileName("iai-material");
+      return "iai-material";
     }
+    return "iai-material";
   };
 
   const downloadBlob = (blob: Blob, name: string) => {

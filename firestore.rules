@@ -1,0 +1,62 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: history
+// Document ID: auto-generated
+// Fields:
+//   - url: string (required) - The URL that was scraped
+//   - mode: string (required, ['page', 'sequence']) - The mode used
+//   - imageCount: number (required) - Number of images found
+//   - timestamp: timestamp (required) - When the scrape occurred
+//   - userId: string (required) - The UID of the user
+//   - fileName: string (optional) - The suggested filename
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidHistory(data) {
+      return data.keys().hasAll(['url', 'mode', 'imageCount', 'timestamp', 'userId']) &&
+             data.url is string && data.url.size() < 2000 &&
+             data.mode in ['page', 'sequence'] &&
+             data.imageCount is number &&
+             data.timestamp is timestamp &&
+             data.userId == request.auth.uid &&
+             (!('fileName' in data) || (data.fileName is string && data.fileName.size() < 255));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /history/{historyId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && isValidHistory(request.resource.data);
+      allow update: if false; // History is immutable
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}
