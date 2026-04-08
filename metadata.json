@@ -1,0 +1,5 @@
+{
+  "name": "IAI Material Scraper & PDF Converter",
+  "description": "Scrape images from IAI Global material pages and convert them into a single PDF document.",
+  "requestFramePermissions": []
+}
