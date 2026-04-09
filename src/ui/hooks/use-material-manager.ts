@@ -25,7 +25,8 @@ export function useMaterialManager() {
   const [pdfSettings, setPdfSettings] = useState<PDFSettings>({
     format: "a4",
     orientation: "portrait",
-    margin: 10
+    margin: 10,
+    quality: "medium"
   });
 
   const handleScrape = useCallback(async (

@@ -103,6 +103,26 @@ export function PDFSettingsPanel({ settings, onSettingsChange }: PDFSettingsPane
             className="py-2"
           />
         </div>
+
+        <div className="space-y-2">
+          <Label className="text-[10px] font-bold text-[#999] uppercase tracking-wider">Quality (File Size)</Label>
+          <Select 
+            value={settings.quality} 
+            onValueChange={(v: any) => onSettingsChange({ ...settings, quality: v })}
+          >
+            <SelectTrigger className="rounded-xl border-[#eee] dark:border-white/10 bg-[#fcfcfc] dark:bg-white/5 h-10">
+              <SelectValue placeholder="Select quality" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl dark:bg-[#1a1a1a] dark:border-white/10">
+              <SelectItem value="high">High (Original Size)</SelectItem>
+              <SelectItem value="medium">Medium (Recommended)</SelectItem>
+              <SelectItem value="low">Low (Smallest File)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-[10px] text-[#999] leading-relaxed">
+            Lower quality reduces file size to avoid "Request Entity Too Large" errors when saving to Drive.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

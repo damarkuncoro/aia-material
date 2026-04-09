@@ -17,6 +17,7 @@ export interface PDFSettings {
   format: "a4" | "letter" | "legal";
   orientation: "portrait" | "landscape";
   margin: number;
+  quality: "high" | "medium" | "low";
 }
 
 export interface IPDFGenerator {
